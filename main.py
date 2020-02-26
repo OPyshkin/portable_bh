@@ -15,7 +15,7 @@ from operator import xor
 import OPi.GPIO as GPIO
 import struct
 from bagholder import bagholder_class
-from bagholder import server_connection
+#from bagholder import server_connection
 import flash
 import wifi_connect
 import subprocess
@@ -132,12 +132,12 @@ if __name__ == "__main__":
     file_verification(bh_object)
     #socket_object.connect('http://194.58.109.227:3000/')
     
-    conn_object = server_connection()
+    #conn_object = server_connection()
     
     @socket_object.on('connect')                                                           
     def on_connect():
         print('connection established')
-        conn_object.status = True
+        bh_object.status = True
         bh_object.toggleOnConnect(port_object)
     
     @socket_object.on('message')
@@ -199,15 +199,15 @@ if __name__ == "__main__":
     def on_disconnect():
         try:
             print('disconnected from server')
-            conn_object.status = False       # Set disconnect flag
+            bh_object.status = False       # Set disconnect flag
             
         except:
             pass
 
     
 
-    usbTask = Thread(target = flash.start, args=(conn_object,))       #USB drive service
-    connectTask = Thread(target = conn_object.socketConnect, args=(socket_object,port_object,))
+    usbTask = Thread(target = flash.start, args=(bh_object,))       #USB drive service
+    connectTask = Thread(target = bh_object.socketConnect, args=(socket_object,port_object,))
     pollTask = Thread(target = polling, args=(port_object,))
 
     usbTask.start()
