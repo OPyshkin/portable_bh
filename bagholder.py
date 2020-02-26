@@ -80,11 +80,12 @@ class server_connection():
                             print (serverSettings['HOST'])
                             print (serverSettings['PORT'])
                             socket.disconnect()
-                            time.sleep(1)
+                            #time.sleep(5)
                             macAddrWlan0 = self.getMAC('wlan0')
                             macAddrEth0 = self.getMAC('eth0')
-                            time.sleep(1)
+                            print("connecting here1")
                             socket.connect('http://%s:%s/?q=%s_%s' % (serverSettings['HOST'],serverSettings['PORT'], macAddrWlan0, macAddrEth0))     # Connect and send query with mac adress
+                            print("connecting here2")
                         elif self.status == True:
                             
                             pass
