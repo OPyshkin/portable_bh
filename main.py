@@ -108,20 +108,43 @@ def file_verification(bh_object):
 
         
 def polling(port):
-    try:
-        data1 =b'\xff' 
-        while True:
-            #print ("polling")
-            data = port.read()
-            if len(data) != 0:
-                if bh_object.currentState != bh_object.nullState and bh_object.sensorMode ==True:
-                    data1=data
-                    slaveData = struct.unpack('<B', data1)
-                    print (slaveData[0])
-                    bh_object.sensorProcess(slaveData[0], port_object)
-            #time.sleep(0.0001)
-    except:
-        pass
+    #try:
+     
+    while True:
+        data1 =[b'\xff',b'\xff']
+        slaveData = [None,None]
+        laserData = [None,None] 
+        #print ("polling")
+        data = port.read()
+        if len(data) != 0:
+            if bh_object.currentState != bh_object.nullState and bh_object.sensorMode ==True:
+                #print ("here")
+                data1[0]=data
+                print (data, "raw0")
+                slaveData = struct.unpack('<B', data1[0])
+                for i in range(0,1):
+                    data = port.read()
+                    print (data, "raw1")
+                    #print(data , i)
+                    if len(data) != 0:
+                        
+                        data1[1]=data
+                        laserData = struct.unpack('<B', data1[1])
+                        if laserData[0] == 0:
+                            bh_object.sensorProcess(slaveData[0], port_object)
+                            print (slaveData[0], laserData[0], "triggered laser")
+                            #print ()
+                        elif laserData[0] ==1:
+                            #pass
+                            print (slaveData[0], laserData[0], "triggered button")
+                            
+                
+            
+        #
+        
+        #time.sleep(0.0001)
+    #except:
+    #    pass
 
 if __name__ == "__main__":
     
@@ -140,13 +163,15 @@ if __name__ == "__main__":
         bh_object.status = True
         bh_object.toggleOnConnect(port_object)
     
-    @socket_object.on('message')
+    @socket_object.on('turn')
     def on_message(data):
-        print (data['data'])
-        if data['data']!=None and data['data'] not in bh_object.inDataBuffer:
+        print (data)
+        data-=1
+        #print (data['data'])
+        if data!=None and data not in bh_object.inDataBuffer:
             bh_object.sensorState[1] = None
-            bh_object.sendReceivedData(data['data'], port_object)
-
+            bh_object.sendReceivedData(data, port_object)
+            
 
     
 
@@ -155,12 +180,14 @@ if __name__ == "__main__":
         print ("received error colour " , data)
         try:
             setCol = open("/root/new_opi/errColour.json","w")                                # Write received to file
-            setCols.errColItem[0]= data['r']
-            setCols.errColItem[1]= data['g']
-            setCols.errColItem[2]= data['b']
-            buffer.newColFlag = True
+            bh_object.errorColorItem[0]= data['r']
+            bh_object.errorColorItem[1]= data['g']
+            bh_object.errorColorItem[2]= data['b']
+            #buffer.newColFlag = True
             json.dump(data, setCol)
             setCol.close()
+            listToSend = [bh_object.currentState[i][j] for i in bh_object.currentState for j in range(0,3)]
+            port_object.write(listToSend)
         except:
             pass
 
@@ -170,13 +197,16 @@ if __name__ == "__main__":
         print ("received base colour " , data)
         try:
             setCol = open("/root/new_opi/baseColour.json","w")                               # Write received to file
-            setCols.baseColItem[0]= data['r']
-            setCols.baseColItem[1]= data['g']
-            setCols.baseColItem[2]= data['b']
-            buffer.newColFlag = True
+            bh_object.baseColorItem[0]= data['r']
+            bh_object.baseColorItem[1]= data['g']
+            bh_object.baseColorItem[2]= data['b']
+            #buffer.newColFlag = True
             #print ("received base colour " , data)
             json.dump(data, setCol)
             setCol.close()
+            listToSend = [bh_object.currentState[i][j] for i in bh_object.currentState for j in range(0,3)]
+            port_object.write(listToSend)
+            print (listToSend)
         except:
             pass
 
@@ -185,7 +215,7 @@ if __name__ == "__main__":
     def set_sensor_mode(data):
         try:
             
-            sensorOnOff.mode = data
+            bh_object.sensorMode = data
             sensFile = open("/root/new_opi/sensMode.json", "w")
             dataJson = {"mode": data}
             print ("received sens mode " , dataJson)

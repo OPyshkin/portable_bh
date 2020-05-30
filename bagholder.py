@@ -61,7 +61,7 @@ class server_connection:
     
 
 class bagholder_class:
-    def __init__(self, inDataBuffer=list(), currentState={key :[0,0,0] for key in range(0,32)}, nullState={key :[0,0,0] for key in range(0,32)}, sensorState=[None,None], baseColorItem=[255,0,0], errorColorItem=[0,255,0], sensorMode=True, newColorFlag=False, status = False, ip = "", port= "", connErrorBuffer= {key :[30,150,0] for key in range(0,32)}):
+    def __init__(self, inDataBuffer=list(), currentState={key :[0,0,0] for key in range(0,32)}, nullState={key :[0,0,0] for key in range(0,32)}, sensorState=[None,None], baseColorItem=[255,0,0], errorColorItem=[0,255,0], sensorMode=True, newColorFlag=False, status = False, ip = "", port= "", connErrorBuffer= {key :[150,30,0] for key in range(0,32)}):
         
         self.inDataBuffer = inDataBuffer
         self.currentState = currentState

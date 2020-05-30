@@ -12,14 +12,23 @@ def run_command(command):
     return output.splitlines()
 
 def disconnect():
+    #command = "sudo nmcli device disconnect wlan0"
+    #res = run_command(command)
+    
     command = "LANG=C nmcli d"
     res = run_command(command)
-    while 'wlan0   wifi      disconnected  --         ' not in res:
+    if 'wlan0   wifi      disconnected  --         ' not in res:
+        command = "sudo nmcli device disconnect wlan0"
+        res = run_command(command)
+        time.sleep(5)
+        '''
         command = 'sudo nmcli con down id MyWifi'
-        run_command(command)
+        run_command(command)    
         time.sleep(1)
         command = "LANG=C nmcli d"
         res = run_command(command)
+        '''
+    
         
 
 def connect(settings):
@@ -28,6 +37,7 @@ def connect(settings):
         
     else:
         disconnect()
+       # time.sleep(1)
         print (settings['WIFI'])
         comm = 'sudo nmcli device wifi connect "{}" password {} name "MyWifi"'.format(settings['WIFI']['SSID'], settings['WIFI']['PASSWORD'])
         run_command(comm)
