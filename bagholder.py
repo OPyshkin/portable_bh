@@ -90,9 +90,20 @@ class bagholder_class:
             #print ('socket connect')
             try:
                 time.sleep(1)
-                config = open('/root/new_opi/settings.json')   # Checking file with params for new adress
-                serverSettings = json.load(config)
-                config.close()
+                try:
+                    config = open('/root/new_opi/settings.json')   # Checking file with params for new adress
+                    serverSettings = json.load(config)
+                    config.close()
+                except:
+                    print('Settings file missing')
+                    setFile = open("/root/new_opi/settings.json", "w")
+                    settings = {
+                        'HOST': "0.0.0.0",
+                        'PORT': "0",
+                        'WIFI': None
+                    }
+                    json.dump(settings, setFile)
+                    setFile.close()
                 if serverSettings['HOST'] != "" and serverSettings['PORT'] != "":            
                     try:
                         if self.ip != serverSettings['HOST'] or self.status==False or self.port != serverSettings['PORT']:   # If disconnected or received new ip

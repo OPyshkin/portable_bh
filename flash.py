@@ -48,6 +48,7 @@ def getMAC(interface):                                                          
 
 def start(connectionObject):
     try:
+        #print(threading.currentThread().getName())
         #interfaceName = getInterfaceName()                                                  # Recieve current interface
         GPIO.setwarnings(False)                                                             # Ignore warning for now
         GPIO.setmode(GPIO.BOARD)                                                            # Use physical pin numbering
@@ -87,11 +88,13 @@ def start(connectionObject):
                             json.dump(settings, localSettings)
                             localSettings.close()
                             if settings['WIFI']!=None:
+                                pass
                                 '''
                                 print("connecting to wifi...")
                                 wifi_connect.connect(settings)
                                 '''
                             else:
+                                pass
                                 '''
                                 print("disconnecting from wifi...")
                                 wifi_connect.disconnect()
@@ -103,8 +106,11 @@ def start(connectionObject):
                             except:
                                 pass
                             
-                            command = "umount %s" %MOUNT_DIR
-                            run_command(command)
+                            try:
+                                command = "umount %s" %MOUNT_DIR
+                                run_command(command)
+                            except:
+                                print ('Fuck')
                             print("unmounting successfully")
                             GPIO.output(18, GPIO.HIGH)
                             GPIO.output(16, GPIO.LOW)
@@ -112,3 +118,4 @@ def start(connectionObject):
                             break
     except Exception as e:
         print(e)
+        print ('Flash error')

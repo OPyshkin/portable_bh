@@ -218,7 +218,7 @@ if __name__ == "__main__":
     dataUart = data_to_send(list())
     bh_object = bagholder_class()
     port_object = serial.Serial('/dev/ttyS1',115200, timeout =1, stopbits=1)
-    socket_object = socketio.Client() 
+    socket_object = socketio.Client(reconnection = False) 
     file_verification(bh_object)
     
     
