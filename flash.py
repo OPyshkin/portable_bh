@@ -3,7 +3,7 @@ import pyudev
 import json
 from time import sleep
 import os
-import wifi_connect
+#import wifi_connect
 import threading
 import OPi.GPIO as GPIO
 
@@ -87,18 +87,20 @@ def start(connectionObject):
                             localSettings = open("/root/new_opi/settings.json", "w")
                             json.dump(settings, localSettings)
                             localSettings.close()
+                            '''
                             if settings['WIFI']!=None:
                                 pass
-                                '''
+                                
                                 print("connecting to wifi...")
                                 wifi_connect.connect(settings)
-                                '''
+                                
                             else:
                                 pass
-                                '''
+                               
                                 print("disconnecting from wifi...")
                                 wifi_connect.disconnect()
-                                '''                                            
+                                                       
+                            '''
                             try:
                                 macAddrFile = open("/root/UsbStick/bhMac.txt", "a")
                                 macAddrFile.write("WLAN: " + macAddrWlan0 + " Ethernet "+ macAddrEth0 + "\n")

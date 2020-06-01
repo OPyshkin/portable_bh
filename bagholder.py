@@ -48,8 +48,9 @@ class bagholder_class:
                     self.sensorState[1] = self.sensorState[0]
                     #return listToSend
                 print (self.sensorState, 'sensor state')
+                #time.sleep(0.010)
                 return listToSend
-                time.sleep(0.010)
+                
         except Exception as e: 
             print(e)
 
@@ -100,36 +101,82 @@ class bagholder_class:
                     settings = {
                         'HOST': "0.0.0.0",
                         'PORT': "0",
-                        'WIFI': None
+                        
                     }
                     json.dump(settings, setFile)
                     setFile.close()
-                if serverSettings['HOST'] != "" and serverSettings['PORT'] != "":            
+                if 'HOST' in serverSettings and 'PORT' in serverSettings:
+                    if serverSettings['HOST'] != "" and serverSettings['PORT'] != "" and serverSettings['PORT']!=None:            
+                        try:
+                            if self.ip != serverSettings['HOST'] or self.status==False or self.port != serverSettings['PORT']:   # If disconnected or received new ip
+                                print (serverSettings['HOST'])
+                                print (serverSettings['PORT'])
+                                socket.disconnect()
+                                time.sleep(1)
+                                macAddrWlan0 = self.getMAC('wlan0')
+                                macAddrEth0 = self.getMAC('eth0')
+                                print("connecting here1")
+                                connString = 'http://%s:%s/?q=%s_%s' % (serverSettings['HOST'],serverSettings['PORT'], macAddrWlan0, macAddrEth0)
+                                print (connString)
+                                socket.connect(connString)     # Connect and send query with mac adress
+                                print("connecting here2")
+                            elif self.status == True:
+                                pass
+                        except:
+                            self.status = False
+                            listToSend = [self.connErrorBuffer[i][j] for i in self.connErrorBuffer for j in range(0,3)]
+                            UART_port.write(listToSend)
+                            print ("reconnecting")
+                    elif serverSettings['HOST'] == "" or serverSettings['PORT'] == "":              # No ip in file
+                        print ("No IP")
+                        self.status = False
+                    elif serverSettings['PORT'] == None:
+                        try:
+                            if self.ip != serverSettings['HOST'] or self.status==False :   # If disconnected or received new ip
+                                print (serverSettings['HOST'])
+                                socket.disconnect()
+                                #time.sleep(5)
+                                macAddrWlan0 = self.getMAC('wlan0')
+                                macAddrEth0 = self.getMAC('eth0')
+                                print("connecting here1 with PORT = null")
+                                connString = 'http://%s:80/?q=%s_%s' % (serverSettings['HOST'], macAddrWlan0, macAddrEth0)
+                                print (connString)
+                                socket.connect(connString)     # Connect and send query with mac adress
+                                print("connecting here2")
+                            elif self.status == True:
+                                pass
+                        except:
+                            self.status = False
+                            listToSend = [self.connErrorBuffer[i][j] for i in self.connErrorBuffer for j in range(0,3)]
+                            UART_port.write(listToSend)
+                            print ("reconnecting")
+                    self.ip = serverSettings['HOST']
+                    self.port = serverSettings['PORT']
+
+                elif 'PORT' not in serverSettings: #if port in json empty
                     try:
-                        if self.ip != serverSettings['HOST'] or self.status==False or self.port != serverSettings['PORT']:   # If disconnected or received new ip
+                        if self.ip != serverSettings['HOST'] or self.status==False :   # If disconnected or received new ip
                             print (serverSettings['HOST'])
-                            print (serverSettings['PORT'])
                             socket.disconnect()
                             #time.sleep(5)
                             macAddrWlan0 = self.getMAC('wlan0')
                             macAddrEth0 = self.getMAC('eth0')
-                            print("connecting here1")
-                            socket.connect('http://%s:%s/?q=%s_%s' % (serverSettings['HOST'],serverSettings['PORT'], macAddrWlan0, macAddrEth0))     # Connect and send query with mac adress
+                            print("connecting here1 with no PORT key")
+                            connString = 'http://%s:80/?q=%s_%s' % (serverSettings['HOST'], macAddrWlan0, macAddrEth0)
+                            print (connString)
+                            socket.connect(connString)     # Connect and send query with mac adress
                             print("connecting here2")
                         elif self.status == True:
                             pass
-
                     except:
                         self.status = False
                         listToSend = [self.connErrorBuffer[i][j] for i in self.connErrorBuffer for j in range(0,3)]
                         UART_port.write(listToSend)
                         print ("reconnecting")
-                    
-                elif serverSettings['HOST'] == "" or serverSettings['PORT'] == "":              # No ip in file
-                    print ("No IP")
-                    self.status = False
-                self.ip = serverSettings['HOST']
-                self.port = serverSettings['PORT']
+                    self.ip = serverSettings['HOST']
+                    self.port = None
+                
+                
             except Exception as e:
                 print(e)
 

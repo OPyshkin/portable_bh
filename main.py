@@ -17,7 +17,7 @@ import struct
 from bagholder import bagholder_class
 #from bagholder import server_connection
 import flash
-import wifi_connect
+#import wifi_connect
 import subprocess
 # autorun at sudo nano /etc/profile
 
@@ -162,7 +162,7 @@ def file_verification(bh_object):
         settings = {
             'HOST': "0.0.0.0",
             'PORT': "0",
-            'WIFI': None
+            
         }
         json.dump(settings, setFile)
         setFile.close()
