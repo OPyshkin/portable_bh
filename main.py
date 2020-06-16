@@ -17,7 +17,7 @@ import struct
 from bagholder import bagholder_class
 #from bagholder import server_connection
 import flash
-#import wifi_connect
+import wifi_connect
 import subprocess
 # autorun at sudo nano /etc/profile
 
@@ -39,7 +39,6 @@ class data_to_send:
     def send_uart(self, port):
         while True:
             try:
-                
                 if len(self.toSend)>0 and self.toSend != None:
                     print('queue:', self.toSend)
                     port.write(self.toSend[0])
@@ -168,16 +167,19 @@ def file_verification(bh_object):
         setFile.close()
         #settings = json.load(setFile)
 
-    '''
-    if settings["WIFI"]!=None:
-        pass
-        #print("connecting to wifi...")
-        #wifi_connect.connect(settings)
+    
+    if 'WIFI' in settings:
+        if settings["WIFI"]!=None:
+            print("connecting to wifi...")
+            wifi_connect.connect(settings)
+        elif settings["WIFI"]==None:
+            print("no wifi")
+            wifi_connect.disconnect()
     else:
-        print("no wifi")
-        pass
-        #wifi_connect.disconnect()
-    '''
+        print ('no WIFI key')
+        wifi_connect.disconnect()
+
+    
 
         
 def polling(port):

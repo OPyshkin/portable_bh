@@ -3,7 +3,7 @@ import pyudev
 import json
 from time import sleep
 import os
-#import wifi_connect
+import wifi_connect
 import threading
 import OPi.GPIO as GPIO
 
@@ -29,7 +29,7 @@ def uuid_from_line(line):
 def getInterfaceName():                                                              # Get name of the Ethernet interface
     try:
         for dirs in os.walk('/sys/class/net'):
-            print (dir)
+            print (dirs)
             for dir in dirs:
                 if dir[:3] =='eth' or dir[:4]=='wlan':
                     interface=dir
@@ -87,20 +87,16 @@ def start(connectionObject):
                             localSettings = open("/root/new_opi/settings.json", "w")
                             json.dump(settings, localSettings)
                             localSettings.close()
-                            '''
-                            if settings['WIFI']!=None:
-                                pass
-                                
-                                print("connecting to wifi...")
-                                wifi_connect.connect(settings)
-                                
+                            if 'WIFI' in settings:
+                                if settings['WIFI']!=None:
+                                    print("connecting to wifi...")
+                                    wifi_connect.connect(settings)
+                                else:
+                                    print("disconnecting from wifi...")
+                                    wifi_connect.disconnect()
                             else:
-                                pass
-                               
-                                print("disconnecting from wifi...")
+                                print ('no WIFI key')
                                 wifi_connect.disconnect()
-                                                       
-                            '''
                             try:
                                 macAddrFile = open("/root/UsbStick/bhMac.txt", "a")
                                 macAddrFile.write("WLAN: " + macAddrWlan0 + " Ethernet "+ macAddrEth0 + "\n")
@@ -111,9 +107,10 @@ def start(connectionObject):
                             try:
                                 command = "umount %s" %MOUNT_DIR
                                 run_command(command)
+                                print("unmounting successfully")
                             except:
-                                print ('Fuck')
-                            print("unmounting successfully")
+                                print ('Err at unmounting')
+                            
                             GPIO.output(18, GPIO.HIGH)
                             GPIO.output(16, GPIO.LOW)
                             #sleep(1)
