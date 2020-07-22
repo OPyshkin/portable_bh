@@ -10,8 +10,10 @@ import OPi.GPIO as GPIO
 # ASSUMED THAT THIS COMMAND HAS ALREADY BEEN RUN
 # sudo mkdir /mnt/usb_stick
 
+#Directory to mount SD
 MOUNT_DIR = "/root/UsbStick"
 
+#Method to execute bash commands
 def run_command(command):
     try:
         ret_code, output = subprocess.getstatusoutput(command)
@@ -21,7 +23,7 @@ def run_command(command):
     except Exception as e:
         print(e)
 
-
+#Get uuid of device 
 def uuid_from_line(line):
     return line[:9]
 
@@ -47,9 +49,7 @@ def getMAC(interface):                                                          
 
 
 def start(connectionObject):
-    try:
-        #print(threading.currentThread().getName())
-        #interfaceName = getInterfaceName()                                                  # Recieve current interface
+    try:                                        # Recieve current interface
         GPIO.setwarnings(False)                                                             # Ignore warning for now
         GPIO.setmode(GPIO.BOARD)                                                            # Use physical pin numbering
         GPIO.setup(18, GPIO.OUT, initial=GPIO.HIGH)                                         
@@ -64,15 +64,11 @@ def start(connectionObject):
             GPIO.output(18, GPIO.HIGH)
             GPIO.output(16, GPIO.LOW)
             if device.action == 'add':
-                #print('{} connected'.format(device))
-                #sleep(3)
-                #print( str(device))
                 if str(device) == "Device('/sys/devices/platform/soc/1c1b000.usb/usb3/3-1/3-1:1.0')" :
                     print('{} connected'.format(device))
                     sleep(3)
                     output = run_command("blkid | grep LABEL | grep -v boot")
                     for usb_device in output:
-                        #print (uuid_from_line(usb_device))
                         if '/dev/sd' in uuid_from_line(usb_device):
                             GPIO.output(18, GPIO.LOW)
                             GPIO.output(16, GPIO.HIGH)
@@ -110,10 +106,8 @@ def start(connectionObject):
                                 print("unmounting successfully")
                             except:
                                 print ('Err at unmounting')
-                            
                             GPIO.output(18, GPIO.HIGH)
                             GPIO.output(16, GPIO.LOW)
-                            #sleep(1)
                             break
     except Exception as e:
         print(e)
